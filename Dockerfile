@@ -5,8 +5,8 @@ RUN addgroup -g 1000 jenkins \
 
 RUN apk upgrade --update
 RUN apk add --no-cache \
-        libstdc++ openjdk7 git tar zip xz libpng-dev \
-        nodejs-current nodejs-current-npm yarn
+        libstdc++ openjdk7 git tar zip openssh-client libpng-dev \
+        nodejs-current nodejs-current-npm yarn 
 RUN npm install npm@5 -g
 
 CMD ["/bin/sh"]
