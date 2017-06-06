@@ -5,7 +5,7 @@ RUN addgroup -g 1000 jenkins \
 
 RUN apk upgrade --update
 RUN apk add --no-cache \
-        libstdc++ openjdk7 git tar zip openssh-client libpng-dev \
+        libstdc++ openjdk7 git tar zip openssh-client libpng-dev python \
         nodejs-current nodejs-current-npm yarn 
 
 CMD ["/bin/sh"]
