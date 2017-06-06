@@ -7,7 +7,7 @@ RUN apk upgrade --update
 RUN apk add --no-cache \
         libstdc++ openjdk7 git tar zip openssh-client libpng-dev python \
         nodejs-current nodejs-current-npm yarn make curl gcc g++ grep \
-        binutils-gold ca-certificates paxctl linux-headers
+        binutils-gold ca-certificates paxctl linux-headers autoconf
 RUN rm -rf \
     /tmp/* \
     /var/cache/apk/* \
