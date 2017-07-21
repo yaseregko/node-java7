@@ -1,4 +1,4 @@
-FROM mkenney/npm:7-debian
+FROM mkenney/npm:7.0-debian
 
 RUN npm install --silent -g npm@5
 
