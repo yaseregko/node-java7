@@ -1,8 +1,8 @@
 FROM mkenney/npm:7.0-debian
 
 npm install --silent -g \
-    npm@latest 
-
+    npm@5
+    
 VOLUME /src
 WORKDIR /src
 
