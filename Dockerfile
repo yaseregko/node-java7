@@ -1,4 +1,6 @@
-FROM node:7.0-wheezy
+FROM node:6.9-wheezy
+
+MAINTAINER Michael Kenney <mkenney@webbedlam.com>
 
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
@@ -22,17 +24,16 @@ RUN set -x \
         wget \
 
     # install npm packages
-    && rm -f /usr/local/bin/yarn
-RUN npm install --silent -g \
+    && rm -f /usr/local/bin/yarn \
+    && npm install --silent -g npm@5\
         gulp-cli \
         grunt-cli \
         bower \
         markdown-styles \
         yarn \
-        npm@5 
 
     # Restore a borne-shell compatible default shell
-RUN rm /bin/sh \
+    && rm /bin/sh \
     && ln -s /bin/bash /bin/sh \
 
 ##############################################################################
