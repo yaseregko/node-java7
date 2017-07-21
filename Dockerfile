@@ -1,8 +1,7 @@
-FROM mkenney/npm:6.9-debian
+FROM mkenney/npm:7-debian
 
-npm install --silent -g \
-    npm@5
-    
+RUN npm install --silent -g npm@5
+
 VOLUME /src
 WORKDIR /src
 
