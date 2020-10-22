@@ -7,9 +7,11 @@ const mqtt         = require('mqtt');
 const config       = JSON.parse(fs.readFileSync('/data/options.json', 'utf8'));
 
 const mqtt_url       = config.mqtt_url || 'mqtt://core-mosquitto:1883';
-const mqtt_username  = config.mqtt_username || '';
-const mqtt_password  = config.mqtt_password || '';
-const mqtt_clientId  = config.mqtt_clientId || 'smtp2mail';
+const mqtt_options   =  {
+                        clientId: config.mqtt_clientId || 'smtp2mqtt',
+                        username: config.mqtt_username,
+                        password: config.mqtt_password
+                        }
 const smtp_port      = config.smtp_port || 25;
 const smtp_host      = config.smtp_host || '0.0.0.0';
 //const smtp_port      = config.smtp_username || 'username';
@@ -48,27 +50,28 @@ function onData(stream, session, callback) {
             if(attachment.size !== 0){
                 let data = attachment.content;
                 let fileName = media_path + '/' + attachment.filename;
-                let mqttClient = mqtt.connect(mqtt_url, mqtt_clientId, mqtt_username, mqtt_password);
-                    mqttClient.on('connect', function () {
-                        console.log('Somebody bell in door. Sending message in mqtt.');
-                        mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'on', { qos: 0 });
-                        fs.writeFile(fileName, data, function(error) { 
-                            if(error) { 
-                                console.log('An error occurred:', error);
-                            } else {
-                                //callback(new Error(`Writing file with error: ${error}`));
-                                console.log("Photo in file:", fileName);
-                                //console.log("Размер: ",  attachment.size);
-                                mqttClient.publish('smtp2mail/camera/doorbell/picture', { filename: fileName, content: data }, { qos: 0 });
-                            }
-                        });
-                        mqttClient.end();
-                    });
-                }
+                fs.writeFile(fileName, data, function(error) { 
+                    if(error) console.log('An error occurred:', error);
+                    //callback(new Error(`Writing file with error: ${error}`));
+                    console.log("Somebody bell in door. Photo saved in file:", fileName);
+                    //console.log("Размер: ",  attachment.size);
+                });
+                let messageData = {
+                    filename: fileName, 
+                    content: data
+                };
+                let mqttClient = mqtt.connect(mqtt_url, mqtt_options)
+                mqttClient.on('connect', function() {
+                    console.log('Sending messages in mqtt.');
+                    mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'on', { qos: 0 });
+                    mqttClient.publish('smtp2mail/camera/doorbell/picture', JSON.stringify(messageData), { qos: 0 });
+                    mqttClient.end();
+                });
             }
-        }).catch(function(error) {
-            console.log('An error occurred:', error.message);
-        });
+        }
+    }).catch(function(error) {
+        console.log('An error occurred:', error.message);
+    });
     callback();
 };
 
