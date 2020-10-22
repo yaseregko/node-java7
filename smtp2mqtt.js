@@ -14,11 +14,12 @@ const smtp_port      = config.smtp_port || 25;
 const smtp_host      = config.smtp_host || '0.0.0.0';
 //const smtp_port      = config.smtp_username || 'username';
 //const smtp_host      = config.smtp_password || 'password';
+const media_path     = config.media_path || '/media';
 
 const smtp = new SMTPServer({
     secure: false,
     disabledCommands: ['STARTTLS'],
-    attachmentOptions: { directory: "/tmp" },
+    attachmentOptions: { directory: media_path },
     //onConnect,
     onAuth,
     //onMailFrom,
@@ -58,7 +59,7 @@ function onData(stream, session, callback) {
                     mqttClient.on('connect', function () {
                         console.log('Sending message in mqtt.');
                         mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'on', { qos: 0 });
-                        mqttClient.publish('smtp2mail/camera/doorbell/picture', `{ "filename": "${fileName}", "content": "${data}" }`, { qos: 0 });
+                        mqttClient.publish('smtp2mail/camera/doorbell/picture', { filename: fileName, content: data }, { qos: 0 });
                         mqttClient.end();
                     });
                 }
@@ -76,7 +77,7 @@ function onAuth(auth, session, callback) {
     if (config.anonymous === true && (auth.username !== smtp_username || auth.password !== smtp_password)) {
       return callback(new Error("Invalid username or password"));
     }*/
-      return callback(null, { user: 123 }); // where 123 is the user id or similar property
+      return callback(null, { user: 007 });
   }
 
 // Валидация получателя. Для каждого адреса функция вызывается отдельно.
