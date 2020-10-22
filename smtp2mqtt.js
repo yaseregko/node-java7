@@ -19,7 +19,6 @@ const media_path     = config.media_path || '/media';
 const smtp = new SMTPServer({
     secure: false,
     disabledCommands: ['STARTTLS'],
-    attachmentOptions: { directory: media_path },
     //onConnect,
     onAuth,
     //onMailFrom,
@@ -48,26 +47,28 @@ function onData(stream, session, callback) {
             let attachment = mail_object.attachments[i];
             if(attachment.size !== 0){
                 let data = attachment.content;
-                let fileName = attachment.filename;
-                fs.writeFile(fileName, data, function(error) { 
-                    if(error) console.log('An error occurred:', error);
-                    //callback(new Error(`Writing file with error: ${error}`));
-                    console.log("Somebody bell in door. Photo in file: ", fileName);
-                    //console.log("Размер: ",  attachment.size);
-                });
+                let fileName = media_path + '/' + attachment.filename;
                 let mqttClient = mqtt.connect(mqtt_url, mqtt_clientId, mqtt_username, mqtt_password);
                     mqttClient.on('connect', function () {
-                        console.log('Sending message in mqtt.');
+                        console.log('Somebody bell in door. Sending message in mqtt.');
                         mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'on', { qos: 0 });
-                        mqttClient.publish('smtp2mail/camera/doorbell/picture', { filename: fileName, content: data }, { qos: 0 });
+                        fs.writeFile(fileName, data, function(error) { 
+                            if(error) { 
+                                console.log('An error occurred:', error);
+                            } else {
+                                //callback(new Error(`Writing file with error: ${error}`));
+                                console.log("Photo in file:", fileName);
+                                //console.log("Размер: ",  attachment.size);
+                                mqttClient.publish('smtp2mail/camera/doorbell/picture', { filename: fileName, content: data }, { qos: 0 });
+                            }
+                        });
                         mqttClient.end();
                     });
                 }
             }
-        //}
-    }).catch(function(error) {
-        console.log('An error occurred:', error.message);
-    });
+        }).catch(function(error) {
+            console.log('An error occurred:', error.message);
+        });
     callback();
 };
 
