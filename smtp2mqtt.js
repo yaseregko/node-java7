@@ -77,7 +77,7 @@ function onAuth(auth, session, callback) {
     if (config.anonymous === true && (auth.username !== smtp_username || auth.password !== smtp_password)) {
       return callback(new Error("Invalid username or password"));
     }*/
-      return callback(null, { user: 007 });
+      return callback(null, { user: 123 });
   }
 
 // Валидация получателя. Для каждого адреса функция вызывается отдельно.
