@@ -54,6 +54,7 @@ smtp.listen(smtp_port, smtp_host, () => {
 			    };
         mqttClient.publish('homeassistant/binary_sensor/doorbell/31102020/config', JSON.stringify(discoveryData), { qos: 0 });
         mqttClient.end();
+	console.log('mqtt discovery send.');
     });
 });
 
