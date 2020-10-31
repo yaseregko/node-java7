@@ -39,13 +39,14 @@ smtp.listen(smtp_port, smtp_host, () => {
 			    'uniq_id': "18483494",
 			    'dev': [{
     				'cns': [{
+				    'connection_type': "wifi",
         			    'mac': "00:00:00:00:00:01"
     				}],
 				'ids': 	'identif',
     				'name': 'doorbell',
     				'mf': 	'Yoosee',
     				'mdl':	'sd05',
-    				'sw': 	'13.0.5',
+    				'sw': 	'13.0.5'
 				}],
 			    'off_dly': 5,
 			    'state_topic': "smtp2mail/binary_sensor/doorbell/state",
