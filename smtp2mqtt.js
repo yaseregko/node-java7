@@ -32,7 +32,7 @@ const smtp = new SMTPServer({
 smtp.listen(smtp_port, smtp_host, () => {
     console.log('Mail server started at %s:%s', smtp_host, smtp_port);
     // mqtt discovery
-    let mqttClient = mqtt.connect(mqtt_url, mqtt_clientId, mqtt_username, mqtt_password);
+    let mqttClient = mqtt.connect(mqtt_url, mqtt_options);
     mqttClient.on('connect', function () {
 	let discoveryData = {
 			    'name': "doorbell-0",
