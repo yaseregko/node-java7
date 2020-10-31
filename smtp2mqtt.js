@@ -38,10 +38,6 @@ smtp.listen(smtp_port, smtp_host, () => {
 			    'name': "doorbell-0",
 			    'uniq_id': "18483494",
 			    'dev': [{
-    				'cns': [{
-				    'connection_type': "wifi",
-        			    'mac': "00:00:00:00:00:01"
-    				}],
 				'ids': 	'identif',
     				'name': 'doorbell',
     				'mf': 	'Yoosee',
