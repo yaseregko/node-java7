@@ -37,16 +37,16 @@ smtp.listen(smtp_port, smtp_host, () => {
 	let discoveryData = {
 			    'name': "doorbell-0",
 			    'uniq_id': "31102020",
-			    'dev': {
-    				'cns': {
+			    'dev': [{
+    				'cns': [{
         			    'mac': "00:11:22:33:44:55",
-    				},
+    				}],
 				'ids': 	'identif',
     				'name': 'doorbell',
     				'mf': 	'Yoosee',
     				'mdl':	'sd05',
     				'sw': 	'13.0.5',
-				},
+				}],
 			    'off_dly': 5,
 			    'state_topic': "smtp2mail/binary_sensor/doorbell/state",
 			    'pl_on': 'bell',
