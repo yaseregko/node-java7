@@ -1,17 +1,16 @@
 'use strict'
 
-const fs           = require('fs');
-const {SMTPServer} = require('smtp-server');
-const simpleParser = require('mailparser').simpleParser;
-const mqtt         = require('mqtt');
-const config       = JSON.parse(fs.readFileSync('/data/options.json', 'utf8'));
-
+const fs             = require('fs');
+const {SMTPServer}   = require('smtp-server');
+const simpleParser   = require('mailparser').simpleParser;
+const mqtt           = require('mqtt');
+const config         = JSON.parse(fs.readFileSync('/data/options.json', 'utf8'));
 const mqtt_url       = config.mqtt_url || 'mqtt://core-mosquitto:1883';
-const mqtt_options   =  {
+const mqtt_options   = {
                         clientId: config.mqtt_clientId || 'smtp2mqtt',
                         username: config.mqtt_username,
                         password: config.mqtt_password
-                        }
+            	       }
 const smtp_port      = config.smtp_port || 25;
 const smtp_host      = config.smtp_host || '0.0.0.0';
 //const smtp_port      = config.smtp_username || 'username';
@@ -32,12 +31,30 @@ const smtp = new SMTPServer({
 
 smtp.listen(smtp_port, smtp_host, () => {
     console.log('Mail server started at %s:%s', smtp_host, smtp_port);
-    /* Регистрация в топике доступности
+    // mqtt discovery
     let mqttClient = mqtt.connect(mqtt_url, mqtt_clientId, mqtt_username, mqtt_password);
     mqttClient.on('connect', function () {
-        mqttClient.publish('homeassistant/state', 'Connect', { qos: 0 });
+	let discoveryData = {
+			    'name': "doorbell-0",
+			    'uniq_id': "31102020",
+			    'dev': {
+    				'cns': {
+        			    'mac': "00:11:22:33:44:55",
+    				},
+				'ids': 	'identif',
+    				'name': 'doorbell',
+    				'mf': 	'Yoosee',
+    				'mdl':	'sd05',
+    				'sw': 	'13.0.5',
+				},
+			    'off_dly': 5,
+			    'state_topic': "smtp2mail/binary_sensor/doorbell/state",
+			    'pl_on': 'bell',
+			    'pl_off': 'idle'
+			    };
+        mqttClient.publish('homeassistant/binary_sensor/doorbell/31102020/config', JSON.stringify(discoveryData), { qos: 0 });
         mqttClient.end();
-    });*/
+    });
 });
 
 // Обработка данных письма
@@ -63,7 +80,7 @@ function onData(stream, session, callback) {
                 let mqttClient = mqtt.connect(mqtt_url, mqtt_options)
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
-                    mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'on', { qos: 0 });
+                    mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'bell', { qos: 0 });
                     mqttClient.publish('smtp2mail/camera/doorbell/picture', JSON.stringify(messageData), { qos: 0 });
                     mqttClient.end();
                 });
