@@ -36,10 +36,10 @@ smtp.listen(smtp_port, smtp_host, () => {
     mqttClient.on('connect', function () {
 	let discoveryData = {
 			    'name': "doorbell-0",
-			    'uniq_id': "31102020",
+			    'uniq_id': "18483494",
 			    'dev': [{
     				'cns': [{
-        			    'mac': "00:11:22:33:44:55",
+        			    'mac': "00:00:00:00:00:01"
     				}],
 				'ids': 	'identif',
     				'name': 'doorbell',
@@ -52,7 +52,7 @@ smtp.listen(smtp_port, smtp_host, () => {
 			    'pl_on': 'bell',
 			    'pl_off': 'idle'
 			    };
-        mqttClient.publish('homeassistant/binary_sensor/doorbell/31102020/config', JSON.stringify(discoveryData), { qos: 0 });
+        mqttClient.publish('homeassistant/binary_sensor/doorbell/18483494/config', JSON.stringify(discoveryData), { qos: 0 });
         mqttClient.end();
 	console.log('mqtt discovery send.');
     });
