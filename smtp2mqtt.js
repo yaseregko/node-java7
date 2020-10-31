@@ -38,6 +38,7 @@ smtp.listen(smtp_port, smtp_host, () => {
 			    'name': "doorbell-0",
 			    'uniq_id': "18483494",
 			    'dev': [{
+				'cns': ['mac', '02:1b:22:78:25:14'],
 				'ids': 	'identif',
     				'name': 'doorbell',
     				'mf': 	'Yoosee',
