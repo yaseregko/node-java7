@@ -13,8 +13,8 @@ const mqtt_options   = {
             	       }
 const smtp_port      = config.smtp_port || 25;
 const smtp_host      = config.smtp_host || '0.0.0.0';
-//const smtp_port      = config.smtp_username || 'username';
-//const smtp_host      = config.smtp_password || 'password';
+//const smtp_username      = config.smtp_username || 'username';
+//const smtp_password      = config.smtp_password || 'password';
 const media_path     = config.media_path || '/media';
 
 const smtp = new SMTPServer({
@@ -38,15 +38,15 @@ smtp.listen(smtp_port, smtp_host, () => {
 			    'name': "doorbell-0",
 			    'uniq_id': "18483494",
 			    'dev': [{
-				'cns': ['mac', '02:1b:22:78:25:14'],
+				'cns': ['mac': '02:1b:22:78:25:14'],
 				'ids': 	'identif',
     				'name': 'doorbell',
     				'mf': 	'Yoosee',
-    				'mdl':	'sd05',
+    				'mdl':	'sd-05',
     				'sw': 	'13.0.5'
 				}],
 			    'off_dly': 5,
-			    'state_topic': "smtp2mail/binary_sensor/doorbell/state",
+			    'state_topic': "smtp2mqtt/binary_sensor/doorbell/state",
 			    'pl_on': 'bell',
 			    'pl_off': 'idle'
 			    };
@@ -79,8 +79,8 @@ function onData(stream, session, callback) {
                 let mqttClient = mqtt.connect(mqtt_url, mqtt_options)
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
-                    mqttClient.publish('smtp2mail/binary_sensor/doorbell/state', 'bell', { qos: 0 });
-                    mqttClient.publish('smtp2mail/camera/doorbell/picture', JSON.stringify(messageData), { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/state', 'bell', { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/camera/doorbell/picture', JSON.stringify(messageData), { qos: 0 });
                     mqttClient.end();
                 });
             }
@@ -97,7 +97,7 @@ function onAuth(auth, session, callback) {
     if (config.anonymous === true && (auth.username !== smtp_username || auth.password !== smtp_password)) {
       return callback(new Error("Invalid username or password"));
     }*/
-      return callback(null, { user: 123 });
+      return callback(null, { user: 123 /* auth.username */ });
   }
 
 // Валидация получателя. Для каждого адреса функция вызывается отдельно.
