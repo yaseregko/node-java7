@@ -46,20 +46,20 @@ smtp.listen(smtpPort, smtpHost, () => {
     // mqtt discovery
     let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
     mqttClient.on('connect', function () {
-        let doorbellButton = device;
-        doorbellButton.set('device_class': 'binary_sensor')
-                      .set('off_dly': 5)
-                      .set('state_topic': 'smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state')
-                      .set('pl_on': 'bell')
-                      .set('pl_off': 'idle')
-                      .set('unique_id': deviceId + '-doorbell-button')
-                      .set('discovery_hash': ('binary_sensor', 'doorbell_button'));
+        let doorbellButton = new Map(Object.entries(device));
+        doorbellButton.set('device_class', 'binary_sensor')
+                      .set('off_dly', 5)
+                      .set('state_topic', 'smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state')
+                      .set('pl_on', 'bell')
+                      .set('pl_off', 'idle')
+                      .set('unique_id', deviceId + '-doorbell-button')
+                      .set('discovery_hash', ('binary_sensor', 'doorbell_button'));
 
-        let doorbellCamera = device;
-        doorbellCamera.set('device_class': 'camera')
-                      .set('topic': 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
-                      .set('unique_id': deviceId + '-doorbell-snapshot')
-                      .set('discovery_hash': ('camera', 'doorbell_snapshot'));
+        let doorbellCamera = new Map(Object.entries(device));
+        doorbellCamera.set('device_class', 'camera')
+                      .set('topic', 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
+                      .set('unique_id', deviceId + '-doorbell-snapshot')
+                      .set('discovery_hash', ('camera', 'doorbell_snapshot'));
 
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', doorbellButton, { qos: 0 });
         mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', doorbellCamera, { qos: 0 });
