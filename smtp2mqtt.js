@@ -1,21 +1,33 @@
 'use strict'
 
-const fs             = require('fs');
-const {SMTPServer}   = require('smtp-server');
-const simpleParser   = require('mailparser').simpleParser;
-const mqtt           = require('mqtt');
-const config         = JSON.parse(fs.readFileSync('/data/options.json', 'utf8'));
-const mqtt_url       = config.mqtt_url || 'mqtt://core-mosquitto:1883';
-const mqtt_options   = {
-                        clientId: config.mqtt_clientId || 'smtp2mqtt',
-                        username: config.mqtt_username,
-                        password: config.mqtt_password
-            	       }
-const smtp_port      = config.smtp_port || 25;
-const smtp_host      = config.smtp_host || '0.0.0.0';
+const deviceId      = '18483494' // Uniq device id, change it!!! 
+const fs            = require('fs');
+const {SMTPServer}  = require('smtp-server');
+const simpleParser  = require('mailparser').simpleParser;
+const mqtt          = require('mqtt');
+const config        = JSON.parse(fs.readFileSync('/data/options.json', 'utf8'));
+const mqttUrl       = config.mqtt_url || 'mqtt://core-mosquitto:1883';
+const mqttOptions   = {
+                       clientId: config.mqtt_clientId || 'smtp2mqtt',
+                       username: config.mqtt_username,
+                       password: config.mqtt_password
+            	      }
+const smtpPort      = config.smtp_port || 25;
+const smtpHost      = config.smtp_host || '0.0.0.0';
 //const smtp_username      = config.smtp_username || 'username';
 //const smtp_password      = config.smtp_password || 'password';
-const media_path     = config.media_path || '/media';
+const mediaPath     = config.media_path || '/media';
+const device        = {
+                        'name': 'Yoosee Doorbell SD-05',
+                        'dev': {
+                                'cns':  [[ 'mac', '02:1b:22:78:25:14']],
+                                'ids': 	deviceId,
+                                'name': 'doorbell',
+                                'mf': 	'Yoosee',
+                                'mdl':	'sd-05',
+                                'sw': 	'13.0.5'
+                                },
+                       };
 
 const smtp = new SMTPServer({
     secure: false,
@@ -29,30 +41,30 @@ const smtp = new SMTPServer({
     authOptional: true
 });
 
-smtp.listen(smtp_port, smtp_host, () => {
-    console.log('Mail server started at %s:%s', smtp_host, smtp_port);
+smtp.listen(smtpPort, smtpHost, () => {
+    console.log('Mail server started at %s:%s', smtpHost, smtpPort);
     // mqtt discovery
-    let mqttClient = mqtt.connect(mqtt_url, mqtt_options);
+    let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
     mqttClient.on('connect', function () {
-	let discoveryData = {
-			    'name': "doorbell-0",
-			    'uniq_id': "18483494",
-			    'dev': [{
-				'cns': ['mac', '02:1b:22:78:25:14'],
-				'ids': 	'identif',
-    				'name': 'doorbell',
-    				'mf': 	'Yoosee',
-    				'mdl':	'sd-05',
-    				'sw': 	'13.0.5'
-				}],
-			    'off_dly': 5,
-			    'state_topic': "smtp2mqtt/binary_sensor/doorbell/state",
-			    'pl_on': 'bell',
-			    'pl_off': 'idle'
-			    };
-        mqttClient.publish('homeassistant/binary_sensor/doorbell/18483494/config', JSON.stringify(discoveryData), { qos: 0 });
+        let doorbellButton = device;
+        doorbellButton.set('device_class': 'binary_sensor')
+                      .set('off_dly': 5)
+                      .set('state_topic': 'smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state')
+                      .set('pl_on': 'bell')
+                      .set('pl_off': 'idle')
+                      .set('unique_id': deviceId + '-doorbell-button')
+                      .set('discovery_hash': ('binary_sensor', 'doorbell_button'));
+
+        let doorbellCamera = device;
+        doorbellCamera.set('device_class': 'camera')
+                      .set('topic': 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
+                      .set('unique_id': deviceId + '-doorbell-snapshot')
+                      .set('discovery_hash': ('camera', 'doorbell_snapshot'));
+
+        mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', doorbellButton, { qos: 0 });
+        mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', doorbellCamera, { qos: 0 });
         mqttClient.end();
-	console.log('mqtt discovery send.');
+	    console.log('mqtt discovery send.');
     });
 });
 
@@ -65,22 +77,19 @@ function onData(stream, session, callback) {
             let attachment = mail_object.attachments[i];
             if(attachment.size !== 0){
                 let data = attachment.content;
-                let fileName = media_path + '/' + attachment.filename;
+                let fileName = mediaPath + '/' + attachment.filename;
                 fs.writeFile(fileName, data, function(error) { 
                     if(error) console.log('An error occurred:', error);
                     //callback(new Error(`Writing file with error: ${error}`));
                     console.log("Somebody bell in door. Photo saved in file:", fileName);
-                    //console.log("Размер: ",  attachment.size);
                 });
-                let messageData = {
-                    filename: fileName, 
-                    content: data
-                };
-                let mqttClient = mqtt.connect(mqtt_url, mqtt_options)
+                const buff = Buffer.from(data, 'utf-8');
+                const base64Data = buff.toString('base64');
+                let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
-                    mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/state', 'bell', { qos: 0 });
-                    mqttClient.publish('smtp2mqtt/camera/doorbell/picture', JSON.stringify(messageData), { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', base64Data, { qos: 0 });
                     mqttClient.end();
                 });
             }
