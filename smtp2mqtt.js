@@ -1,6 +1,6 @@
 'use strict'
 
-const deviceId      = '18483494' // Uniq device id, change it!!! 
+const deviceId      = '18483494' // Uniq device id, change it!!!
 const fs            = require('fs');
 const {SMTPServer}  = require('smtp-server');
 const simpleParser  = require('mailparser').simpleParser;
@@ -11,23 +11,20 @@ const mqttOptions   = {
                        clientId: config.mqtt_clientId || 'smtp2mqtt',
                        username: config.mqtt_username,
                        password: config.mqtt_password
-            	      }
+                      }
 const smtpPort      = config.smtp_port || 25;
 const smtpHost      = config.smtp_host || '0.0.0.0';
 //const smtp_username      = config.smtp_username || 'username';
 //const smtp_password      = config.smtp_password || 'password';
 const mediaPath     = config.media_path || '/media';
-const device        = {
-                        'name': 'Yoosee Doorbell SD-05',
-                        'dev': {
-                                'cns':  [[ 'mac', '02:1b:22:78:25:14']],
-                                'ids': 	deviceId,
-                                'name': 'doorbell',
-                                'mf': 	'Yoosee',
-                                'mdl':	'sd-05',
-                                'sw': 	'13.0.5'
-                                },
-                       };
+const deviceMap     = new Map( [['name', 'Yoosee Doorbell SD-05'],
+                                ['dev': ['cns': [ 'mac', '02:1b:22:78:25:14']],
+                                        ['ids', deviceId],
+                                        ['name', 'doorbell'],
+                                        ['mf', 'Yoosee'],
+                                        ['mdl', 'sd-05'],
+                                        ['sw', '13.0.5' ]
+                                ]]);
 
 const smtp = new SMTPServer({
     secure: false,
@@ -46,7 +43,7 @@ smtp.listen(smtpPort, smtpHost, () => {
     // mqtt discovery
     let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
     mqttClient.on('connect', function () {
-        let doorbellButton = new Map(Object.entries(device));
+        var doorbellButton = deviceMap;
         doorbellButton.set('device_class', 'binary_sensor')
                       .set('off_dly', 5)
                       .set('state_topic', 'smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state')
@@ -54,17 +51,17 @@ smtp.listen(smtpPort, smtpHost, () => {
                       .set('pl_off', 'idle')
                       .set('unique_id', deviceId + '-doorbell-button')
                       .set('discovery_hash', ('binary_sensor', 'doorbell_button'));
-
-        let doorbellCamera = new Map(Object.entries(device));
+        console.log(doorbellButton);
+        var doorbellCamera = deviceMap;
         doorbellCamera.set('device_class', 'camera')
                       .set('topic', 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
                       .set('unique_id', deviceId + '-doorbell-snapshot')
                       .set('discovery_hash', ('camera', 'doorbell_snapshot'));
-
-        mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', doorbellButton, { qos: 0 });
-        mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', doorbellCamera, { qos: 0 });
+        console.log(doorbellCamera);
+        mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
+        mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
         mqttClient.end();
-	    console.log('mqtt discovery send.');
+        console.log('mqtt discovery send.');
     });
 });
 
@@ -78,7 +75,7 @@ function onData(stream, session, callback) {
             if(attachment.size !== 0){
                 let data = attachment.content;
                 let fileName = mediaPath + '/' + attachment.filename;
-                fs.writeFile(fileName, data, function(error) { 
+                fs.writeFile(fileName, data, function(error) {
                     if(error) console.log('An error occurred:', error);
                     //callback(new Error(`Writing file with error: ${error}`));
                     console.log("Somebody bell in door. Photo saved in file:", fileName);
@@ -102,7 +99,7 @@ function onData(stream, session, callback) {
 
 // Проверка авторизации
 function onAuth(auth, session, callback) {
-/*  Будет реализована в следующих релизах  
+/*  Будет реализована в следующих релизах
     if (config.anonymous === true && (auth.username !== smtp_username || auth.password !== smtp_password)) {
       return callback(new Error("Invalid username or password"));
     }*/
@@ -131,5 +128,5 @@ function onMailFrom({address}, session, callback) {
 
 // Подключаемся к mqtt при коннекте к smtp
 function onConnect(session, callback) {
-	callback();
+        callback();
     };
