@@ -59,8 +59,8 @@ smtp.listen(smtpPort, smtpHost, () => {
    //                   .set('unique_id', deviceId + '-doorbell-snapshot')
     //                  .set('discovery_hash', ('camera', 'doorbell_snapshot'));
      //   console.log(doorbellCamera);
-        mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
-     //   mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
+        //mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
+        //mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
         mqttClient.end();
         console.log('mqtt discovery send.');
     });
@@ -87,7 +87,7 @@ function onData(stream, session, callback) {
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
                     mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
-                    //mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', base64Data, { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', base64Data, { qos: 0 });
                     mqttClient.end();
                 });
             }
