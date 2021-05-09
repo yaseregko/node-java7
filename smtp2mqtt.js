@@ -45,13 +45,13 @@ smtp.listen(smtpPort, smtpHost, () => {
     mqttClient.on('connect', function () {
         var doorbellButton = new Map();
         doorbellButton.set('name', 'yoosee')
-                      .set('device_class', 'binary_sensor')
+                      //.set('device_class', 'binary_sensor')
                       .set('off_dly', 5)
                       .set('state_topic', 'smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state')
                       .set('pl_on', 'bell')
                       .set('pl_off', 'idle')
-                      .set('unique_id', deviceId + '-doorbell-button')
-                      .set('discovery_hash', ('binary_sensor', 'doorbell_button'));
+                      .set('unique_id', 'button-' + deviceId)
+                      //.set('discovery_hash', ('binary_sensor', 'doorbell_button'));
         console.log(doorbellButton);
    //     var doorbellCamera = deviceMap;
    //     doorbellCamera.set('device_class', 'camera')
@@ -87,7 +87,7 @@ function onData(stream, session, callback) {
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
                     mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
-                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', base64Data, { qos: 0 });
+                    //mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', base64Data, { qos: 0 });
                     mqttClient.end();
                 });
             }
