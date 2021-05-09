@@ -17,14 +17,14 @@ const smtpHost      = config.smtp_host || '0.0.0.0';
 //const smtp_username      = config.smtp_username || 'username';
 //const smtp_password      = config.smtp_password || 'password';
 const mediaPath     = config.media_path || '/media';
-const deviceMap     = new Map( [['name', 'Yoosee Doorbell SD-05'],
-                                ['dev': ['cns': [ 'mac', '02:1b:22:78:25:14']],
-                                        ['ids', deviceId],
-                                        ['name', 'doorbell'],
-                                        ['mf', 'Yoosee'],
-                                        ['mdl', 'sd-05'],
-                                        ['sw', '13.0.5' ]
-                                ]]);
+//const deviceMap     = new Map( [['name', 'Yoosee Doorbell SD-05'],
+//                                ['dev', ['cns', [ 'mac', '02:1b:22:78:25:14']],
+//                                        ['ids', deviceId],
+//                                        ['name', 'doorbell'],
+//                                        ['mf', 'Yoosee'],
+//                                        ['mdl', 'sd-05'],
+//                                        ['sw', '13.0.5' ]
+//                                ]]);
 
 const smtp = new SMTPServer({
     secure: false,
@@ -43,8 +43,9 @@ smtp.listen(smtpPort, smtpHost, () => {
     // mqtt discovery
     let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
     mqttClient.on('connect', function () {
-        var doorbellButton = deviceMap;
-        doorbellButton.set('device_class', 'binary_sensor')
+        var doorbellButton = new Map();
+        doorbellButton.set('name', 'yoosee')
+                      .set('device_class', 'binary_sensor')
                       .set('off_dly', 5)
                       .set('state_topic', 'smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state')
                       .set('pl_on', 'bell')
@@ -52,14 +53,14 @@ smtp.listen(smtpPort, smtpHost, () => {
                       .set('unique_id', deviceId + '-doorbell-button')
                       .set('discovery_hash', ('binary_sensor', 'doorbell_button'));
         console.log(doorbellButton);
-        var doorbellCamera = deviceMap;
-        doorbellCamera.set('device_class', 'camera')
-                      .set('topic', 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
-                      .set('unique_id', deviceId + '-doorbell-snapshot')
-                      .set('discovery_hash', ('camera', 'doorbell_snapshot'));
-        console.log(doorbellCamera);
+   //     var doorbellCamera = deviceMap;
+   //     doorbellCamera.set('device_class', 'camera')
+   //                   .set('topic', 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
+   //                   .set('unique_id', deviceId + '-doorbell-snapshot')
+    //                  .set('discovery_hash', ('camera', 'doorbell_snapshot'));
+     //   console.log(doorbellCamera);
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
-        mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
+     //   mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
         mqttClient.end();
         console.log('mqtt discovery send.');
     });
