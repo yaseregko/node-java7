@@ -81,13 +81,13 @@ function onData(stream, session, callback) {
                     //callback(new Error(`Writing file with error: ${error}`));
                     console.log("Somebody bell in door. Photo saved in file:", fileName);
                 });
-                const buff = Buffer.from(data, 'utf-8');
-                const base64Data = buff.toString('base64');
+                var buff = Buffer.from(data, 'utf-8');
+                var base64Data = buff.toString('base64');
                 let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
                     mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
-                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', base64Data, { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', buff, { qos: 0 });
                     mqttClient.end();
                 });
             }
