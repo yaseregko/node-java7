@@ -50,7 +50,7 @@ smtp.listen(smtpPort, smtpHost, () => {
                       .set('pl_off', 'idle');
         console.log(doorbellButton);
         var doorbellCamera = new Map();
-        doorbellCamera.set('topic', 'smtp2mqtt/camera/doorbell/' + deviceId + '/capture')
+        doorbellCamera.set('topic', 'smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot')
         console.log(doorbellCamera);
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
         mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
@@ -75,15 +75,15 @@ function onData(stream, session, callback) {
                     console.log("Somebody bell in door. Photo saved in file:", fileName);
                 });
                 var buff = Buffer.from(data, 'utf-8');
-                var base64Data = buff.toString('base64');
-                console.log(buff);
-                console.log(base64Data);         
+                //let base64Data = buff.toString('base64');
+                //console.log(base64Data);
                 let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
                 mqttClient.on('connect', function() {
                     console.log('Sending messages in mqtt.');
                     mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
-                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/capture', buff, { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/snapshot', buff, { qos: 0 });
                     mqttClient.end();
+                    console.log('End Sending.');
                 });
             }
         }
