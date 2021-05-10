@@ -17,9 +17,14 @@ const smtpHost      = config.smtp_host || '0.0.0.0';
 //const smtp_username      = config.smtp_username || 'username';
 //const smtp_password      = config.smtp_password || 'password';
 const mediaPath     = config.media_path || '/media';
-//const deviceMap     = { "name": "Yoosee Doorbell SD-05".
-//                        "sw": "1.0.0"
-//                      }
+const networkInfo   = { "mac": "00:00:00"
+                      };
+const deviceInfo     = { "name": "Yoosee Doorbell SD-05".                                      
+                         "manufacturer": "Yoosee", 
+                         "model": "SD-05",
+                         "identifiers": deviceId,
+                         "sw_version": "13.0.5"
+                       };
 
 const smtp = new SMTPServer({
     secure: false,
@@ -40,6 +45,7 @@ smtp.listen(smtpPort, smtpHost, () => {
     mqttClient.on('connect', function () {
         var doorbellButton = {"name": "Doorbell Button",
                               "unique_id": "doorbell_" + deviceId,
+                              "device": deviceInfo,
                               "state_topic": "smtp2mail/binary_sensor/doorbell/" + deviceId + "/state",
                               "off_dly": 5,
                               "pl_on": "bell",
@@ -49,7 +55,8 @@ smtp.listen(smtpPort, smtpHost, () => {
         var doorbellCamera = {
                            "name": "Doorbell Camera Capture",
                            "topic": "smtp2mqtt/camera/doorbell/" + deviceId + "/capture",
-                           "unique_id": "doorbell_" + deviceId
+                           "unique_id": "doorbell_" + deviceId,
+                           "device": deviceInfo
                            };
         console.log(doorbellCamera);
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
@@ -79,11 +86,11 @@ function onData(stream, session, callback) {
                 //console.log(base64Data);
                 let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
                 mqttClient.on('connect', function() {
-                    console.log('Sending messages in mqtt.');
+                    //console.log('Sending messages in mqtt.');
                     mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
                     mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/capture', buff, { qos: 0 });
                     mqttClient.end();
-                    console.log('End Sending.');
+                    //console.log('End Sending.');
                 });
             }
         }
