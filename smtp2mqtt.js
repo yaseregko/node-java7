@@ -19,7 +19,7 @@ const smtpHost      = config.smtp_host || '0.0.0.0';
 const mediaPath     = config.media_path || '/media';
 const networkInfo   = { "mac": "00:00:00"
                       };
-const deviceInfo     = { "name": "Yoosee Doorbell SD-05".                                      
+const deviceInfo     = { "name": "Yoosee Doorbell SD-05",                                    
                          "manufacturer": "Yoosee", 
                          "model": "SD-05",
                          "identifiers": deviceId,
