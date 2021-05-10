@@ -82,7 +82,7 @@ function onData(stream, session, callback) {
                 var buff = Buffer.from(data, 'utf-8');
                 let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
                 mqttClient.on('connect', function() {
-                    mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/stat', 'bell', { qos: 0 });
+                    mqttClient.publish('smtp2mqtt/binary_sensor/doorbell/' + deviceId + '/state', 'bell', { qos: 0 });
                     mqttClient.publish('smtp2mqtt/camera/doorbell/' + deviceId + '/capture', buff, { qos: 0 });
                     mqttClient.end();
                 });
