@@ -52,14 +52,14 @@ smtp.listen(smtpPort, smtpHost, () => {
                               "pl_on": "bell",
                               "pl_off": "idle"
                               };
-        mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos: 0 });
+        mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos:0, retain: true });
         var doorbellCamera = {
                               "name": "Doorbell Camera Capture",
                               "topic": "smtp2mqtt/camera/doorbell/" + deviceId + "/capture",
                               "unique_id": "doorbell_" + deviceId,
                               "device": deviceInfo
                               };
-        mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0 });
+        mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0, retain: true });
         mqttClient.end();
     });
 });
