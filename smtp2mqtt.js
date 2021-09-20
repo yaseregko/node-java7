@@ -20,6 +20,7 @@ const mediaPath     = config.media_path || '/media';
 const deviceInfo    = { "name": "Yoosee Doorbell SD-05",                                    
                         "manufacturer": "Yoosee", 
                         "model": "SD-05",
+                        "identifiers": deviceId, 
                         "sw_version": "13.0.5"
                       };
 
