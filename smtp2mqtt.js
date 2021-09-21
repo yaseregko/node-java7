@@ -43,6 +43,7 @@ smtp.listen(smtpPort, smtpHost, () => {
     mqttClient.on('connect', function () {
         var doorbellButton = {
                               "name": "Doorbell Button",
+                              "unique_id": "doorbell_" + deviceId,
                               "device": deviceInfo,
                               "state_topic": "smtp2mqtt/doorbell/" + deviceId + "/state",
                               "off_dly": "5",
@@ -53,6 +54,7 @@ smtp.listen(smtpPort, smtpHost, () => {
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos:0, retain: true });
         var doorbellFilename = {
                               "name": "Doorbell Snapshot Filename",
+                              "unique_id": "doorbell_" + deviceId,
                               "device": deviceInfo,
                               "state_topic": "smtp2mqtt/doorbell/" + deviceId + "/state",
                               "value_template": "{{ value_json.filename }}"
@@ -60,6 +62,7 @@ smtp.listen(smtpPort, smtpHost, () => {
         mqttClient.publish('homeassistant/sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellFilename), { qos:0, retain: true });
         var doorbellCamera = {
                               "name": "Doorbell Camera Snapshot",
+                              "unique_id": "doorbell_" + deviceId,
                               "topic": "smtp2mqtt/doorbell/" + deviceId + "/snapshot",
                               "device": deviceInfo
                               };
