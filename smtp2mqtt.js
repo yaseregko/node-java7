@@ -47,9 +47,9 @@ smtp.listen(smtpPort, smtpHost, () => {
                               "device": deviceInfo,
                               "state_topic": "smtp2mqtt/doorbell/" + deviceId + "/state",
                               "off_dly": "5",
-                              "pl_on": "BELL",
-                              "pl_off": "IDLE",
-                              "value_template": "{{ value_json.state }}"
+                              "pl_on": "ON",
+                              "pl_off": "OFF",
+                              "value_template": "{{ value_json.bell }}"
                               };
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos:0, retain: true });
         var doorbellFilename = {
@@ -83,12 +83,12 @@ function onData(stream, session, callback) {
                 fs.writeFile(fileName, attachment.content, function(error) {
                     if(error) console.log('An error occurred:', error);
                     //callback(new Error(`Writing file with error: ${error}`));
-                    console.log("Somebody bell in door. Photo saved in file:", fileName);
+                    console.log("Somebody bell in door. Picture saved in file:", fileName);
                 });
                 var mqttSensorData = {
-                                  "state": "BELL",
-                                  "filename": attachment.filename
-                                  };
+                                      "bell": "ON",
+                                      "filename": attachment.filename
+                                      };
                 var mqttCameraData = Buffer.from(attachment.content, 'utf-8'); // В буфере изображение 
                 let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
                 mqttClient.on('connect', function() {
