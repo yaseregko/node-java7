@@ -5,7 +5,7 @@ const {SMTPServer}  = require('smtp-server');
 const simpleParser  = require('mailparser').simpleParser;
 const mqtt          = require('mqtt');
 const config        = JSON.parse(fs.readFileSync('/data/options.json', 'utf8'));
-const deviceId      = config.deviceId || '0';
+const deviceId      = config.device_id || '0';
 const mqttUrl       = config.mqtt_url || 'mqtt://core-mosquitto:1883';
 const mqttOptions   = {
                        clientId: config.mqtt_clientId || 'smtp2mqtt',
