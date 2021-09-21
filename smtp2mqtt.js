@@ -40,10 +40,10 @@ smtp.listen(smtpPort, smtpHost, () => {
     console.log('Mail server started at %s:%s', smtpHost, smtpPort);
     // mqtt discovery
     let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
-    mqttClient.on('connect', function () {
+    mqttClient.on('connect', function() {
         var doorbellButton = {
                               "name": "Doorbell Button",
-                              "unique_id": "doorbell_" + deviceId + "_button",
+                              "unique_id": deviceId + "_button",
                               "device": deviceInfo,
                               "state_topic": "smtp2mqtt/doorbell/" + deviceId + "/state",
                               "off_dly": "5",
@@ -53,8 +53,8 @@ smtp.listen(smtpPort, smtpHost, () => {
                               };
         mqttClient.publish('homeassistant/binary_sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellButton), { qos:0, retain: true });
         var doorbellFilename = {
-                              "name": "Doorbell Snapshot Filename",
-                              "unique_id": "doorbell_" + deviceId + "_filename",
+                              "name": "Doorbell Snapshot File",
+                              "unique_id": deviceId + "_filename",
                               "device": deviceInfo,
                               "state_topic": "smtp2mqtt/doorbell/" + deviceId + "/state",
                               "value_template": "{{ value_json.filename }}"
@@ -62,9 +62,9 @@ smtp.listen(smtpPort, smtpHost, () => {
         mqttClient.publish('homeassistant/sensor/doorbell/' + deviceId + '/config', JSON.stringify(doorbellFilename), { qos:0, retain: true });
         var doorbellCamera = {
                               "name": "Doorbell Camera Snapshot",
-                              "unique_id": "doorbell_" + deviceId  + "_snapshot",
-                              "topic": "smtp2mqtt/doorbell/" + deviceId + "/snapshot",
-                              "device": deviceInfo
+                              "unique_id": deviceId + "_snapshot",
+                              "device": deviceInfo,
+                              "topic": "smtp2mqtt/doorbell/" + deviceId + "/snapshot"
                               };
         mqttClient.publish('homeassistant/camera/doorbell/' + deviceId + '/config', JSON.stringify(doorbellCamera), { qos: 0, retain: true });
         mqttClient.end();
